@@ -9,6 +9,7 @@ __license__ = 'MIT'
 __copyright__ = 'Copyright 2014, Lucas Ou-Yang'
 
 import logging
+import os
 import requests
 
 from .configuration import Configuration
@@ -19,6 +20,7 @@ log = logging.getLogger(__name__)
 
 
 FAIL_ENCODING = 'ISO-8859-1'
+SCRAPERAPI_API_KEY = os.environ["SCRAPERAPI_API_KEY"]
 
 
 def get_request_kwargs(timeout, useragent, proxies, headers):
@@ -60,7 +62,7 @@ def get_html_2XX_only(url, config=None, response=None):
         return _get_html_from_response(response, config)
 
     response = requests.get(
-        url=url, **get_request_kwargs(timeout, useragent, proxies, headers))
+        url=f"http://api.scraperapi.com?api_key={SCRAPERAPI_API_KEY}&url={url}", **get_request_kwargs(timeout, useragent, proxies, headers))
 
     html = _get_html_from_response(response, config)
 
@@ -106,7 +108,7 @@ class MRequest(object):
 
     def send(self):
         try:
-            self.resp = requests.get(self.url, **get_request_kwargs(
+            self.resp = requests.get(f"http://api.scraperapi.com?api_key={SCRAPERAPI_API_KEY}&url={self.url}", **get_request_kwargs(
                 self.timeout, self.useragent, self.proxies, self.headers))
             if self.config.http_success_only:
                 self.resp.raise_for_status()
